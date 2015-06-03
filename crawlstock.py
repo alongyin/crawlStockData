@@ -6,7 +6,18 @@ import time
 def checkDirectory(directory):
 	if(not os.path.exists(directory)):
 		os.mkdir(directory)
-def crawlStock(date,dateRoot,code,srcUrl):
+def crawlStock(date,dateRoot,code,srcUrl,sYear,sMonth,sDay):
+	dYear = 2015
+	dMonth = 6
+	dDay = 1
+	if(sYear == dYear and sMonth == dMonth and sDay > dDay):
+		print "time out"
+		return 
+	elif(sYear == dYear and sMonth > dMonth):
+		print "time out"
+		return
+	else:
+		pass
 	url = srcUrl + date + "&symbol=" + code
 	print(url)
 	data = ""
@@ -43,8 +54,6 @@ def mainCrawl(sYear,sMonth,sDay,codeList,root,code):
 	srcUrl = "http://market.finance.sina.com.cn/downxls.php?date="
 	list31day = [1,3,5,7,8,10,12]
 	dYear = 2016
-	dMonth = 6
-	dDay = 1
 	codeIndex = codeList.index(code)
 	codeListLen = len(codeList)
 	while codeIndex < codeListLen:
@@ -62,7 +71,6 @@ def mainCrawl(sYear,sMonth,sDay,codeList,root,code):
 					date2 += str(sMonth)+"-"
 				if sMonth in list31day:
 					while sDay < 32:
-						time.sleep(3)
 						date3 = date2
 						if sDay < 10:
 							date3 += "0"+str(sDay)
@@ -70,12 +78,11 @@ def mainCrawl(sYear,sMonth,sDay,codeList,root,code):
 							date3 += str(sDay)
 						dateRoot = codeRoot+"/"+date3
 						checkDirectory(dateRoot)
-						crawlStock(date3,dateRoot,codeName,srcUrl)
+						crawlStock(date3,dateRoot,codeName,srcUrl,sYear,sMonth,sDay)
 						sDay += 1
 					sDay =1
 				else:
 					while sDay < 31:
-						time.sleep(3)
 						date3 = date2
 						if sDay < 10:
 							date3 += "0"+str(sDay)
@@ -83,7 +90,7 @@ def mainCrawl(sYear,sMonth,sDay,codeList,root,code):
 							date3 += str(sDay)
 						dateRoot = codeRoot+"/"+date3
 						checkDirectory(dateRoot)
-						crawlStock(date3,dateRoot,codeName,srcUrl)
+						crawlStock(date3,dateRoot,codeName,srcUrl,sYear,sMonth,sDay)
 						sDay += 1
 					sDay =1
 				sMonth += 1
@@ -98,4 +105,4 @@ if __name__ == "__main__":
 	shCodeList = readLinesOfFile('shcode')
 	szRoot = 'sz'
 	checkDirectory(szRoot)
-	mainCrawl(2014,1,13,szCodeList,szRoot,"000001")
+	mainCrawl(2014,5,21,szCodeList,szRoot,"000413")
