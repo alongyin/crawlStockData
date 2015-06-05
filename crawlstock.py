@@ -2,10 +2,24 @@
 import urllib2
 import os
 import time
+import thread
 
 def checkDirectory(directory):
 	if(not os.path.exists(directory)):
 		os.mkdir(directory)
+
+def checkfile(filepath):
+	if(os.path.exists(filepath)):
+		f = open(filepath,"r")
+		data = f.read()
+		f.close()
+		if(len(data) == 0 or len(data) == 82):
+			return True
+		else:
+			print "file length:"+str(len(data))
+			return False
+	else:
+		return True
 def crawlStock(date,dateRoot,code,srcUrl,sYear,sMonth,sDay):
 	dYear = 2015
 	dMonth = 6
@@ -18,6 +32,9 @@ def crawlStock(date,dateRoot,code,srcUrl,sYear,sMonth,sDay):
 		return
 	else:
 		pass
+	fileName = dateRoot+"/"+date+"_"+code+".xls"
+	if(not checkfile(fileName)):
+		return 
 	url = srcUrl + date + "&symbol=" + code
 	print(url)
 	data = ""
@@ -32,7 +49,6 @@ def crawlStock(date,dateRoot,code,srcUrl,sYear,sMonth,sDay):
 		f = open("error","a+")
 		f.write(code+" "+date+"\r\n")
 		f.close()
-	fileName = dateRoot+"/"+date+"_"+code+".xls"
 	print(fileName)
 	f = open(fileName,'w')
 	f.write(data)
@@ -99,10 +115,26 @@ def mainCrawl(sYear,sMonth,sDay,codeList,root,code):
 		sYear = 2014
 	return	
 
-
-if __name__ == "__main__":
-	szCodeList = readLinesOfFile('szcode')
+#thread function
+def threadSH():
 	shCodeList = readLinesOfFile('shcode')
+	shRoot = 'sh'
+	checkDirectory(shRoot)
+	mainCrawl(2014,1,1,shCodeList,shRoot,'600000')
+
+def threadSZ():
+	szCodeList = readLinesOfFile('szcode')
 	szRoot = 'sz'
 	checkDirectory(szRoot)
-	mainCrawl(2014,5,21,szCodeList,szRoot,"000413")
+	mainCrawl(2014,1,1,szCodeList,shRoot,"000001")
+
+
+if __name__ == "__main__":
+	try:
+		thread.start_new_thread(threadSH,())
+		thread.start_new_thread(threadSZ,())
+	except:
+		pass
+	while 1:
+		pass
+	
